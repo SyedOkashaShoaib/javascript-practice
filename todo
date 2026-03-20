@@ -1,0 +1,16 @@
+Better understand the global object, global scope.
+The distinction between var and let
+check how prototype works with accessors.
+How enumeration in objects works.
+Lookup the enumeration order later on.
+getter setter behaviour in Object.assign
+Accessor properies in js objects.
+Array searching and sorting methods 
+look at implicit invocation in 8.2.5
+Functions as namspaces
+look at the last closure example
+Prototype property of functions 
+name property of functions 
+higher-order functions
+partial application of functions
+memoization

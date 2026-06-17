@@ -16,3 +16,10 @@ const sum = (x,y) => x + y; //sum is not exported. It remains a private helper f
 
 exports.mean = (data) => data.reduce(sum) / data.length; //added to the exports object.
 
+
+/*2. Exporting a single value : 
+Instead appending a public api as a property of the pre-existing exports object, you can essentially
+overwrite the entire object: */
+
+modules
+

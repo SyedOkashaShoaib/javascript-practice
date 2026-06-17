@@ -27,7 +27,7 @@ After invoking a constructor, the following things happen:
 THE PROTOTYPE CHAIN:
 All JS objects have a prototype object, however, all js functions have a prototype property as well(excluding arrow functions, 
 generator functions, and async functions).
-This prototype property is inherited by the newly created function.*/
+The object created by new Constructor() gets its internal prototype set to Constructor.prototype.*/
 
 function Constructor(a, b) {
     this.a = a;
@@ -41,7 +41,7 @@ Constructor.prototype = {
     was used here, then the invocation context would probably be globalThis, and this.a, this.b will print
     undefined. */
 }
-a = new Constructor(1, 2); // implicitly returns a new object.
+let a = new Constructor(1, 2); // implicitly returns a new object.
 a.inherits_this();
 
 

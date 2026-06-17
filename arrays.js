@@ -20,7 +20,11 @@ console.log(array4.length); // says 2. Because js allows an extra comma after th
 //Using the spread operator:
 
 let array5 = [{ y: 2 }, ...array, 3]; //[{y : 2},1, 'Happyyyy', {x : 1},3 ]
+array5[3].x = 90;
+array5[2] = 'Saad';
+console.log(array); //[ 1, 'Happyyyy', { x: 90 } ]
 
+console.log(array5); //[ { y: 2 }, 1, 'Saad', { x: 90 }, 3 ]
 //the spread operator creates a shallow copy. A shallow copy duplicates the container, but not the nested objects.
 //the spread operator works on any iterable:
 //strings are iterable:

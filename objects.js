@@ -93,9 +93,9 @@ for (const x in obj2) {
     console.log(x);
 }
 
-// for ( const x of Object.keys(obj2)) {
-//     console.log(x);
-// } // no inherited stuff printed apparently. It does not include
+for ( const x of Object.keys(obj2)) {
+    console.log(x);
+} // no inherited stuff printed apparently. Pbject.keys does not include
 // non-enumerable properties, inherited properties, or properties
 // whose name is a Symbol 
 
@@ -128,3 +128,8 @@ console.log(target); // the nested object's reference is copied.
 target.y.y = 3;
 console.log(source.y); //changed in source object as well.
 
+let o = {x: 1, y: 2};
+
+for (let key in o) {
+    console.log(o[key]);
+}

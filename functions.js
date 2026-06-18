@@ -74,9 +74,8 @@ arrow instead of the `function` keyword.
 **The Code:**
 
 ```javascript
-[cite_start]// A comma-separated list of parameters, the arrow, and a curly-brace body. [cite: 102]
-const sum = (x, y) => { return x + y; [cite_start]}; [cite: 103]
-
+A comma-separated list of parameters, the arrow, and a curly-brace body.
+const sum = (x, y) => { return x + y;}; 
 console.log(sum(5, 10)); // Output: 15
 
 ```
@@ -91,7 +90,7 @@ automatically return its value.
 
 ```javascript
 // Extremely compact and highly readable.
-[cite_start]const sum = (x, y) => x + y; [cite: 105]
+const sum = (x, y) => x + y;
 
 console.log(sum(5, 10)); // Output: 15
 
@@ -106,7 +105,7 @@ around the parameter list.
 
 ```javascript
 // No parentheses around 'x'. 
-[cite_start]const polynomial = x => x*x + 2*x + 3; [cite: 107]
+const polynomial = x => x*x + 2*x + 3; 
 
 console.log(polynomial(2)); // Output: 11
 
@@ -223,7 +222,8 @@ o.m(); // Invoke the method m on the object o.
 
 ```
 
-*Note: Before ES6, developers constantly had to write `let self = this;` (or `let that = this;`) just so their inner functions could access the outer object . It was widely considered a flaw in the language .*
+*Note: Before ES6, developers constantly had to write `let self = this;` (or `let that = this;`) just so their inner
+ functions could access the outer object . It was widely considered a flaw in the language .*
 
 ---
 
@@ -353,7 +353,7 @@ let object = {
         // this.a = x; 
         /*
         the above line causes the stack overflow error. Why??
-        because this.a = x recursively calls the setter again, and keeps calling it under the stack
+        because this.a = x recursively calls the setter again, and keeps calling it until the stack
         literally overflows and the program crashes.
         Solution (According to Gemini):
         Use a backing variable:

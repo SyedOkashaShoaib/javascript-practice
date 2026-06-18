@@ -171,7 +171,7 @@ class ComplexNumbers {
         return that instanceof ComplexNumbers && that.r === this.r && that.i === this.i;
     }
     toString() {
-        return `{${this.r} hello ${this.i} }`; //always add a tostring method -> good for debugging
+        return `{ r = ${this.r}, i = ${this.i} }`; //always add a tostring method -> good for debugging
     }
     get real() { return this.r; }
     get imaginary() { return this.i; }
@@ -189,7 +189,9 @@ console.log(c1.plus(c2));
 //ADDING METHODS TO EXISTING CLASSSES:
 /*
 You can add methods to already existing classes because in javascript, inheritance is dynamic! You simply add methods
-to the prototype property and those methods are automatically added to all the class objects.
+to the prototype property and those methods are automatically accessible by the objects.
+c1.new_function() -> js looks at c1.prototype, does not find a method named new_function, then it looks at ComplexNumbers.prototype,
+and finds the method. 
 */
 
 ComplexNumbers.prototype.new_function = function () { console.log("New function"); }
@@ -234,8 +236,16 @@ Range.prototype = {
 }
 
 Range.prototype.constructor = Range;
+/* Range.prototype.constructor = Range makes prototype.constructor enumerable, which is not default behaviour, therefore a better approach
+might be(acc. to ChatGPT:*/
+// Object.defineProperty(Range.prototype, "constructor", {
+//     value: Range,
+//     writable: true,
+//     configurable: true,
+//     enumerable: false
+// });
 
-r = new Range(1, 2);
+let r = new Range(1, 2);
 console.log(r.toString());
 
 

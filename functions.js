@@ -411,8 +411,8 @@ Nested method. this keyword refers to : [object global] */
 
 /*UNDERSTANDING CONSTRUCTOR INVOCATION: 
 1. When you invoke a function with a new keyword, js does not execute it like  a normal function.
-2. Js intercepts the function execution, creates a new object, makes it the invocation context, and
-adds the prototype object's properties to the newly created object. Since the invocation context is the 
+2. Js intercepts the function execution, creates a new object, makes it the invocation context, and links that object’s internal 
+[[Prototype]] to the constructor’s .prototype object.. Since the invocation context is the 
 new object, you can use this to add new properties to it in the constructor.
 
 RETURN VALUE OF A CONSTRUCTOR:
@@ -565,12 +565,37 @@ startServer(base_config.port, base_config.host, advanced_config.protocol, advanc
 /*
 Option 2: 
 destructure the object in the argument.
-Order does not matter */
+If the function parameter uses object destructuring,
+JavaScript extracts matching property names from the object.
+Extra properties are ignored.
+Order does not matter.
+*/
+// function startServer({
+//     port = 3000,
+//     host = "localhost",
+//     protocol = "HTTP",
+//     isSecure = false
+// } = {}) {
+//     console.log(`Starting server on ${protocol}://${host}:${port}`);
+//     console.log(`Secure: ${isSecure}`);
+// }
 
-let config = {port : 8080, host : "localhost",protocol : "HTTP", isSecure : true, extra_property : "I will be ignored"};
+// let base_config = {
+//     port: 8080,
+//     host: "localhost"
+// };
 
-startServer(config);
-/*js will match the arguments itself */
+// let advanced_config = {
+//     protocol: "HTTP",
+//     isSecure: true
+// };
+
+// let config = {
+//     ...base_config,
+//     ...advanced_config
+// };
+
+// startServer(config);
 
 function func(x,y) {
     console.log(`${x} , ${y}`);
@@ -590,8 +615,9 @@ are mapped to parameters index-wise. */
 //UNDERSTANDING FUNCTIONS AS VALUES:
 
 /*
-Functions are not just block of codes, they are first-class objects. They are just a value, and can 
-be treated like primitives, or objects:
+Functions are not just block of codes, they are first-class objects(functions are treated like normal
+ values. You can store them, pass them around, return them from other functions, and attach 
+ properties to them.). They are just a value, and can be treated like primitives, or objects:
 1. You can assign a function to variable
 2. You can assign it to an object propery
 3. You can pass it as a function argument
@@ -632,8 +658,8 @@ console.log(returnUniqueInteger()); //0
 console.log(returnUniqueInteger()); //1
 
 
-//Treating a function as an array:
-factorial[1] = 1; //base case. Treating factorial like a cache array!
+//Treating a function as an array(not really an array, it is technically an object!):
+factorial[1] = 1; //base case. Treating factorial like a cache "array"!
 function factorial(n) {
     if (Number.isInteger(n) && n > 0) {
         if (!factorial[n]) {
@@ -703,7 +729,7 @@ arg.apply(object, [1,2]);
 
 /*Understanding the bind() method:
 binds a function to an object. The object is permanently set as the invocation context.
-Main purpose is to make non-arrow like functions to behave like arrow-functions. 
+bind() is used to create a new function with a fixed this value and optionally fixed starting arguments.
 1 You invoke bind on a function. 
 2. It returns a new function 
 3. Invoking the new function invokes the original function as a method of the object that the function has been bound to.
@@ -730,7 +756,8 @@ in arrow functions, it doesnt matter, the invocation context cant be changed by 
 In non-arrow functions, in strict mode, it stays null, whereas in non-strict mode, it becomes the global object. */
 console.log(succ(2));  // 2 us assigned to y.
 console.log(succ.name); //the name property is also changed. the "bound" prefix is added to the  name of the function on which bind() was called upon.
-console.log(succ.toString()); //function () { [native code] } whatever is the point.
+console.log(succ.toString()); //function () { [native code] } JavaScript does not show you the actual source code of the bound 
+// wrapper function.
 
 // console.log(arg.prototype);
 // let ad = new arg();

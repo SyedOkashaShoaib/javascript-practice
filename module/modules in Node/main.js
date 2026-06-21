@@ -1,4 +1,4 @@
-const stats = require('./stats.js'); // Omitting .js is fine in CommonJS. 
+const stats = require('./stats.js'); // Omitting .js is fine in CommonJS (Original module system for Node JS). 
 const {Bitset} = require('./sets.js');
 console.log(stats.mean())
 bitset = new Bitset()

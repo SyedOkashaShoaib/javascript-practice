@@ -32,4 +32,9 @@ import * as stat from './stats2.js';
  */
 console.log(stat.mean())
 
+console.log(import.meta.url); // gives the absolute URL from where the module was loaded. 
+/*In node js, it returns a path starting from file:..., in web browsers, the path starts from 
+https:...
+THe primary use case is to allow a module to reference resources relative to its own physical location.
+*/
 

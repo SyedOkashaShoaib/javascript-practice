@@ -94,4 +94,20 @@ console.log(m.get(null)); //Hooooooo
 console.log(m);
 /*ITERATION: 
 1. Insertion order is maintained. 
-2.  */
+2. The most natural way of iterating over a map is by using destructering:  */
+for (let [key, value] of m ) {
+    console.log(`key : ${key}, value: ${value}`)
+}
+
+for (let keys of m.keys()) {
+    console.log(keys);
+} 
+
+//OR
+let keys_m = [...m.keys()]; //using the spread operator to extract the keys
+let values_m = [...m.values()]; 
+let entries_m = [...m.entries()]; 
+
+
+/*FOREACH METHOD FOR MAPS:
+syntax map.foreach((value, key) => {}) */

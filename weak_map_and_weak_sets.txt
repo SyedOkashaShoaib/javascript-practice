@@ -1,0 +1,141 @@
+I DONT QUITE UNDERSTAND THIS YET. GONNA TOUCH BACK ON THIS LATER.
+
+Let's dive into the final part of this section: **11.1.3 WeakMap and WeakSet**.
+
+Since you are learning backend design, this is arguably the most critical concept to
+ grasp when working with data structures. In a server environment like Node.js, your 
+ application runs continuously for days or months. If you mismanage memory, your server will
+  eventually crash. `WeakMap` and `WeakSet` were explicitly designed to prevent these memory leaks.
+
+To understand them, we must first understand the garbage collector.
+
+### **The Garbage Collector (GC)**
+
+Garbage collection is the process by which the JavaScript interpreter automatically 
+reclaims the memory of objects that are no longer "reachable" or usable by your program.
+
+A regular `Map` or `Set` holds "strong" references to its keys and values. If you put 
+an object into a standard `Map`, that object is considered "reachable" because the `Map` is 
+holding onto it. Even if every other part of your backend deletes its references to that object,
+ the garbage collector will refuse to delete it because the `Map` is still keeping it alive. This 
+ is how memory leaks happen.
+
+`WeakMap` and `WeakSet` hold "weak" references. This means their presence in the map or set does 
+*not* prevent the garbage collector from reclaiming their memory.
+
+---
+
+### **1. The WeakMap Class**
+
+A `WeakMap` is a variant of the `Map` class that does not prevent its key values from being garbage collected. The `WeakMap()` constructor works just like the `Map()` constructor, but it enforces three strict limitations:
+
+1. 
+**Keys MUST be Objects or Arrays:** You cannot use primitive values (strings, numbers, booleans) as keys. Primitive values are not subject to garbage collection in the same way objects are, so they are explicitly banned here.
+
+
+2. 
+**Strictly Not Iterable:** `WeakMap` only implements the `get()`, `set()`, `has()`, and `delete()` methods. It does not define `keys()`, `values()`, or `forEach()`, nor can you use a `for/of` loop on it. Why? Because if you could iterate over a `WeakMap`, you could access its keys. If you can access its keys, they are "reachable," which completely defeats the purpose of being "weak".
+
+
+3. **No `size` Property:** Because the garbage collector runs in the background at unpredictable 
+intervals, objects could be deleted from the `WeakMap` at any millisecond. Therefore, the size 
+of a `WeakMap` is constantly fluctuating, and tracking a `size` property is impossible.
+
+
+
+#### **Backend Use Case: Caching**
+
+The primary intended use of `WeakMap` is to associate values with objects without causing 
+memory leaks.
+
+Imagine you are writing a backend middleware function that takes an incoming HTTP Request object 
+and performs a heavy, time-consuming database lookup to fetch the user's permissions. Because the 
+request might pass through multiple different functions that all need those permissions, you want 
+to cache the result so you only query the database once.
+
+```javascript
+const permissionCache = new WeakMap();
+
+async function getPermissions(requestObject) {
+    // If we already computed this for this specific request, return it instantly
+    if (permissionCache.has(requestObject)) {
+        return permissionCache.get(requestObject);
+    }
+
+    // Otherwise, do the heavy DB query
+    const permissions = await heavyDatabaseQuery(requestObject.userId);
+    
+    // Cache it, using the request object itself as the key
+    permissionCache.set(requestObject, permissions);
+    
+    return permissions;
+}
+
+```
+
+If you used a regular `Map` for this, every single HTTP request object your server ever received 
+would be trapped in the `Map` forever, consuming all your RAM. By using a `WeakMap`, the moment 
+the HTTP response is sent to the client and the Node.js server discards the `requestObject`, the
+ `WeakMap` automatically drops the cache entry. Zero memory leaks.
+
+---
+
+### **2. The WeakSet Class**
+
+`WeakSet` implements a set of objects that does not prevent those objects from being garbage
+ collected.
+
+The `WeakSet()` constructor works like `Set()`, but it carries the exact same limitations as 
+`WeakMap`:
+
+* It does not allow primitive values; it only accepts objects.
+
+
+* It implements only `add()`, `has()`, and `delete()`. It is strictly not iterable.
+
+
+* It does not have a `size` property.
+
+
+
+#### **Backend Use Case: Branding / State Tracking**
+
+`WeakSet` is used less frequently than `WeakMap`, but its primary use case is to mark 
+(or "brand") an object as having a special property or state.
+
+Suppose you are managing a pool of WebSocket connections. You want to keep track of which 
+connections have successfully authenticated, so you don't process sensitive commands from 
+unauthenticated sockets.
+
+```javascript
+const authenticatedSockets = new WeakSet();
+
+function handleAuth(socket, token) {
+    if (verifyToken(token)) {
+        // Mark this specific socket as authenticated
+        authenticatedSockets.add(socket);
+    }
+}
+
+function processSensitiveCommand(socket, command) {
+    // Quickly check the brand/mark
+    if (!authenticatedSockets.has(socket)) {
+        throw new Error("Unauthorized connection");
+    }
+    // Process command...
+}
+
+```
+
+If you used a standard `Set`, you would have to remember to manually write 
+`authenticatedSockets.delete(socket)` every time a user disconnected, or else the server would 
+hold onto that dead connection object forever. With a `WeakSet`, the moment the socket closes 
+and the server drops the connection object, it vanishes from the `WeakSet` automatically.
+
+---
+
+This concludes everything the textbook covers regarding the `Set` and `Map` families. The next 
+major topic in Chapter 11 introduces **Typed Arrays and Binary Data** (Section 11.2). 
+Working with binary data is an essential skill for backend systems dealing with files,
+ network protocols, or streams. Are you ready to move into Typed Arrays, or is there a
+  specific edge case regarding Sets and Maps you want to stress-test first?

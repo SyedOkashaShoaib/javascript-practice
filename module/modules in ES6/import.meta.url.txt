@@ -1,0 +1,84 @@
+No problem. Let's drop the textbook fluff and look at this strictly from a backend systems 
+architecture perspective. This is a notorious trap when building scalable directory structures.
+
+Here is the exact problem `import.meta.url` solves, broken down.
+
+### The Problem: The "Current Working Directory" Trap
+
+When you write a backend application in Node.js, you usually start it from the root folder of 
+your project. For example, you open your terminal in the `project-root` directory and type:
+
+`node src/server.js`
+
+Now, imagine you have a deep directory structure. You wrote an ES6 module specifically to handle
+your PostgreSQL database schema, and it lives here:
+`project-root/src/database/utils/schema-loader.js`
+
+Inside `schema-loader.js`, you want to read a SQL file located in the exact same folder:
+`project-root/src/database/utils/tables.sql`
+
+Your first instinct is to write this inside `schema-loader.js`:
+
+```javascript
+import fs from 'fs';
+// Trying to read the file right next to this script
+const sql = fs.readFileSync('./tables.sql', 'utf-8'); 
+
+```
+
+**This will crash your server.** Why? Because in Node.js, a relative path like `./` does 
+not resolve relative to *where the file lives*. It resolves relative to **where you ran the 
+terminal command**.
+
+Since you ran `node src/server.js` from `project-root`, Node thinks `./tables.sql` means 
+`project-root/tables.sql`. It looks in the wrong folder, fails to find the file, and throws an error.
+
+### The Solution: Forcing Self-Awareness
+
+Your `schema-loader.js` module needs a way to confidently say: *"I don't care where the user 
+executed the `node` command. Find the file sitting exactly right next to ME."*
+
+In older legacy Node.js code, developers used a global variable called `__dirname` to solve this. 
+But ES6 modules are designed to be universally compatible across web browsers and backend servers. 
+Browsers don't have "directories," they have URLs. Therefore, ES6 modules use `import.meta.url` 
+instead of `__dirname`.
+
+When you type `import.meta.url` inside `schema-loader.js`, the module outputs its own absolute, 
+hardcoded location on your machine. It will literally return a string like:
+`file:///C:/Users/Ukasha/project-root/src/database/utils/schema-loader.js`
+
+### The Real-World Implementation
+
+To actually use this string to find your `tables.sql` file, you combine it with the native 
+JavaScript `URL` object. Here is the exact pipeline you use to guarantee your module never 
+loses track of its dependencies, regardless of where the app is launched from:
+
+```javascript
+import fs from 'fs';
+import { fileURLToPath } from 'url'; // Native Node utility
+
+// Step 1: Get the absolute URL of the file currently executing this code
+const myLocation = import.meta.url; 
+// Output: "file:///C:/Users/.../src/database/utils/schema-loader.js"
+
+// Step 2: Use the URL constructor. 
+// It takes your target relative path ('./tables.sql') and merges it with the base location (myLocation).
+const fileUrl = new URL('./tables.sql', myLocation);
+// Output: "file:///C:/Users/.../src/database/utils/tables.sql"
+
+// Step 3: The 'fs' (file system) module doesn't like "file://" URLs. 
+// It wants a normal machine path. We strip the "file://" part away.
+const absoluteMachinePath = fileURLToPath(fileUrl);
+// Output: "C:\Users\...\src\database\utils\tables.sql"
+
+// Step 4: Safely read the file. This will now work 100% of the time.
+const sql = fs.readFileSync(absoluteMachinePath, 'utf-8');
+
+```
+
+By doing this, your database module is entirely self-contained. You could drag and drop the 
+`database` folder into a completely different microservice, and the code will instantly adapt 
+and find its `tables.sql` file without you needing to rewrite a single file path.
+
+---
+

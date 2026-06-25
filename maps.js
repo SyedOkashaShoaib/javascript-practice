@@ -111,3 +111,5 @@ let entries_m = [...m.entries()];
 
 /*FOREACH METHOD FOR MAPS:
 syntax map.foreach((value, key) => {}) */
+
+

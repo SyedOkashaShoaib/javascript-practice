@@ -164,3 +164,33 @@ Key: page, Value: 20 */
  db, two separate times for the same request.  */
  params.sort()
  console.log(params);
+
+ /*
+ Exercise 1: The Analytics Sanitizer (Cache Normalization)
+The Scenario:
+Your Node.js server acts as a caching layer. Users frequently share links on social media that append tracking tags like utm_source or gclid to the URL. If User A requests ?item=4&utm_source=twitter and User B requests ?item=4&utm_source=facebook, your caching layer will treat them as two entirely different requests and hit the database twice for the exact same item.
+
+Your Task:
+Write a function sanitizeUrlForCache(rawUrlString) that strips out any marketing tags, sorts the remaining parameters alphabetically, and returns the clean URL string.
+
+Test Data:
+
+JavaScript
+const dirtyUrl = "https://store.com/api/products?id=88&utm_medium=email&category=shoes&utm_source=newsletter";
+
+// Expected Output:
+// "https://store.com/api/products?category=shoes&id=88"
+Hint: You will need to iterate over the search parameters to find keys starting with "utm_". Be careful when deleting items from an iterable while looping through it. */
+
+const dirtyUrl = "https://store.com/api/products?id=88&utm_medium=email&category=shoes&utm_source=newsletter"
+let url1 = new URL(dirtyUrl);
+let params_url1 = url1.searchParams;
+let url1_keys = [...params_url1.keys()];
+for (let key of url1_keys) {
+     if (key.startsWith('utm_')) {
+        params_url1.delete(key);
+     }
+}
+
+params_url1.sort();
+console.log(url1.href);

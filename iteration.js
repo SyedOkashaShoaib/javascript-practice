@@ -209,5 +209,7 @@ Assume that you are iterating over a file, and the iteration loop is terminated 
 iterator obj is linked to the file, the file remains open. 
 How do we fix this? 
 WHenever an iteration is terminated prematurely, js engine looks for a return method inside the iterator, and executes
-it. Inside this return method, we can do the required garbage collection or whatnot.*/
+it. Inside this return method, we can do the required garbage collection or whatnot.
+
+Note: The return statement must return an object. */
 

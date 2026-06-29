@@ -69,3 +69,78 @@ class Range {
 }
 
 console.log([...new Range(1, 10)]);
+
+
+/*Some stuff that you can do with generators: 
+ */
+
+/*Fibonacci sequence: 
+You can use never ending loops in generators: */
+
+function *fibonacciSequence() {
+    let x = 0, y = 1;
+    while(true) {
+        yield y;
+        [x,y] = [y, x + y];
+        
+    }   
+}
+/*However if we run fibonacciSequence as it is it will keep on running forever.  */
+
+function fibonacci(n) {
+    for(let f of fibonacciSequence()) {
+        if (n-- <= 0){
+            return f;
+        }
+    }
+}
+
+console.log(fibonacci(20));
+
+
+/*
+Since infinite generators are dangerous if left unchecked, it is a common functional programming pattern to 
+wrap them in a utility that limits how many items they can yield.
+
+Textbook Example: The take Generator
+The textbook introduces take(n, iterable) . This generator grabs the iterator of whatever iterable you pass to it,
+ and yields exactly n items before intentionally returning and closing the stream */
+
+
+ function *take(n, iterable) {
+    let iterator = iterable[Symbol.iterator]();
+
+    while (n-- >= 0) {
+        let next = iterator.next();
+        if (next.done) {
+            return;
+        }
+        else {
+            yield next.value;
+        }
+    }
+ }
+
+ console.log([...take(10, fibonacciSequence())]);
+
+
+
+ function *zip(...iterables) {
+    let iterator = iterables.map(x=>x[Symbol.iterator]());
+    let index = 0;
+    while(iterator.length > 0) {
+        if (index >= iterator.length) { 
+            index = 0;
+        }
+        let next = iterator[index].next();
+        if (next.done ) {
+            iterator.splice(index,1);
+        }
+        else {
+            yield next.value;
+            index++;
+        }
+    }
+ }
+
+ console.log(...zip(oneDigitPrime(), new Range(1,10), 'abcd', [1,2,3] ));

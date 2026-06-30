@@ -138,9 +138,36 @@ The textbook introduces take(n, iterable) . This generator grabs the iterator of
         }
         else {
             yield next.value;
-            index++;
+            // index++;
         }
     }
  }
 
  console.log(...zip(oneDigitPrime(), new Range(1,10), 'abcd', [1,2,3] ));
+/*
+UNDERSTANDING yield*:
+ what does yield* do? 
+ it essentially says, that I am pausing my own execution, and I am handing complete control over to this other 
+ iterable object. I will not resume my own code until that other iterable has completely finished yielding every 
+ single one of its values.*/
+
+ function *zip_2(...iterable) {
+    let iterator = iterable.map(x=>x[Symbol.iterator]());
+    index = 0;
+    for (let iter of iterable) {
+        yield* iter;
+    }
+    
+// [
+//   2,   3,   5,   7,   1, 2, 3,
+//   4,   5,   6,   7,   8, 9, 10,
+//   'a', 'b', 'c', 'd', 1, 2, 3
+// ]
+ }
+
+ console.log([...zip_2(oneDigitPrime(), new Range(1,10), 'abcd', [1,2,3] )]);
+
+
+
+
+

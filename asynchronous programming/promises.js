@@ -90,10 +90,12 @@ passed in the corresponding .then has finished executing.
 
 function getText4(url) {
     fetch(url)
-    .then(response => response.json()) // initially only the header is returned initially. response.json returns a promise object. That is why we can chain another then. 
+    .then((response )=> {
+        console.log("then(c1)", response);
+        return response.json();}) // initially only the header is returned initially. response.json returns a promise object. That is why we can chain another then. 
     /*response.json waits for the stream, reads it, and runs json.parse() to it. since this is done asynchronously, 
     and takes time, it returns a promise object.  */
-    .then(data => console.log(data))
+    .then((data) => console.log("then(c2):\n", data))
     .catch(error=>console.log(error));
 };
  getText4('https://jsonplaceholder.typicode.com/todos/1');
@@ -141,3 +143,31 @@ never did anything with promise 3, nothing happens when that
 Promise settles, and the chain of asynchronous computation
 ends at this point.
  */
+/**
+ Important terms:
+ Pending → fetch(url) hasn't gotten a response yet.
+Fulfilled (commonly called "resolved") → response arrived, .then() runs.
+Rejected → network failure, .catch() runs.
+Settled → either of the above happened; the Promise isn't pending anymore.
+ */
+
+/*
+RESOLVING A PROMISE:
+->Not the same as a promise being settled. 
+The engine evaluates fetch(url).then(callback1).then(callback2) synchronously and instantly.
+This means that the first .then mmust return a promise object to the second .then immediately. first then()
+returns p2 to then(c2). When fetch(url)'s promise is fulfilled, then(c1) is evaluated; rsponse.json() must wait 
+for all the incoming packets, therefore it must return a promise object -> p4.This means that p2 is now RESOLVED 
+into p4. Its fate is locked on that of p4; if p4 is fulfilled, p2 is fulfilled, and if p4 is rejected, p2 is as well.
+
+Because p2 is the structural link that the rest of the chain is waiting on, it acts as a proxy. It looks at p4 and 
+essentially says: "I will mimic whatever you do. If you fulfill, I will fulfill with your data. If you reject with
+ a syntax error, I will reject with your error." .
+ 
+ THEN WHY DOES THE SAME LOGIC NOT APPLY BETWEEN FETCH AND THEN(C1)? 
+ Because fetch() is not a part of Javascript promise architecture, it is a host api. When we call fetch we are 
+ calling a lwo level C++ function and therefore it behaves differently.  */
+
+
+ /*More on Promises and errors: 
+ Promise errors trickle down until they find a catch() invocation. */

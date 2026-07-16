@@ -1,49 +1,108 @@
-def authorize_department_task(
-    task: WorkflowTask,
-):
-    """
-    Authorize access to a departmental checklist.
+<!doctype html>
 
-    NOC tasks require a portal account. Other departments require
-    the secure task-specific session established from the email link.
-    """
+<html lang="en">
 
-    department_name = (
-        task.phase.department.name
-        or ""
-    ).strip().upper()
+<head>
+    <meta charset="utf-8">
 
-    if department_name == "NOC":
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
-        if not current_user.is_authenticated:
-            return redirect(
-                url_for(
-                    "auth.login",
-                    next=request.full_path,
-                )
-            )
+    <title>
+        {% block title %}
+            Department Task
+        {% endblock %}
+    </title>
 
-        if not current_user.has_role(
-            ROLE_NOC_OPERATOR,
-            ROLE_SYSTEM_ADMIN,
-        ):
-            abort(403)
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/app.css'
+        ) }}"
+    >
 
-        return None
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/pages/task_access.css'
+        ) }}"
+    >
 
-    grant = get_session_grant_for_task(
-        task,
-        allow_consumed_read_only=(
-            request.method == "GET"
-        ),
-    )
+    {% block head %}{% endblock %}
+</head>
 
-    if grant is None:
-        return (
-            render_template(
-                "task_access/unavailable.html"
-            ),
-            404,
-        )
 
-    return None
+<body class="task-access-body">
+
+    <a
+        class="skip-link"
+        href="#main-content"
+    >
+        Skip to main content
+    </a>
+
+
+    <header class="task-access-header">
+
+        <div>
+            <div class="task-access-header__company">
+                Barrett Hodgson
+            </div>
+
+            <div class="task-access-header__system">
+                Offboarding Workflow System
+            </div>
+        </div>
+
+    </header>
+
+
+    <main
+        id="main-content"
+        class="task-access-workspace"
+    >
+
+        {% with messages = get_flashed_messages(
+            with_categories=true
+        ) %}
+
+            {% if messages %}
+                <div aria-live="polite">
+                    {% for category, message in messages %}
+                        <div
+                            class="
+                                system-message
+                                system-message--{{ category }}
+                            "
+                        >
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        {% endwith %}
+
+
+        {% block breadcrumbs %}{% endblock %}
+
+        {% block page_header %}{% endblock %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+
+    <footer class="task-access-footer">
+        Secure departmental task access
+    </footer>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

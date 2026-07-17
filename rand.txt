@@ -1,105 +1,87 @@
-.task-access-body {
-    min-height: 100vh;
-    background: #dce7ef;
-}
+{% extends "layouts/task_base.html" %}
 
 
-.task-access-header {
-    padding: 13px 20px;
-    color: #ffffff;
-    background:
-        linear-gradient(
-            to bottom,
-            var(--chrome-top),
-            var(--chrome-bottom)
-        );
-    border-bottom: 1px solid #173e5a;
-}
+{% block title %}
+    Open Assigned Task
+{% endblock %}
 
 
-.task-access-header__company {
-    font-size: 17px;
-    font-weight: 600;
-}
+{% block content %}
+
+<section class="task-access-card">
+
+    <h1>Departmental Clearance Assignment</h1>
+
+    <p>
+        Confirm that you want to open the assigned
+        employee offboarding task.
+    </p>
 
 
-.task-access-header__system {
-    margin-top: 2px;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 12px;
-}
+    <dl class="task-access-summary">
+
+        <div>
+            <dt>Case Number</dt>
+            <dd>{{ task.case.case_number }}</dd>
+        </div>
+
+        <div>
+            <dt>Employee</dt>
+            <dd>{{ task.case.employee_name }}</dd>
+        </div>
+
+        <div>
+            <dt>Responsible Department</dt>
+            <dd>{{ task.phase.department.name }}</dd>
+        </div>
+
+        <div>
+            <dt>Assigned Task</dt>
+            <dd>{{ task.phase.name }}</dd>
+        </div>
+
+        <div>
+            <dt>Due Date</dt>
+            <dd>
+                {% if task.due_at %}
+                    {{ task.due_at.strftime(
+                        "%d %B %Y, %I:%M %p"
+                    ) }}
+                {% else %}
+                    Not recorded
+                {% endif %}
+            </dd>
+        </div>
+
+    </dl>
 
 
-.task-access-workspace {
-    width: min(1180px, calc(100% - 28px));
-    margin: 20px auto;
-}
+    <div class="task-access-warning">
+
+        <strong>Secure assignment link</strong>
+
+        <p>
+            This link provides access only to this task.
+            Do not forward or share it.
+        </p>
+
+    </div>
 
 
-.task-access-card {
-    max-width: 620px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #ffffff;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-medium);
-    box-shadow: var(--shadow-panel);
-}
+    <form
+        method="post"
+        action="{{ url_for(
+            'task_access.continue_to_task'
+        ) }}"
+        class="task-access-form"
+    >
+        {{ form.hidden_tag() }}
 
+        {{ form.submit(
+            class_="btn-primary"
+        ) }}
+    </form>
 
-.task-access-card h1 {
-    margin-top: 0;
-}
+</section>
 
-
-.task-access-summary {
-    display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-    gap: 12px 20px;
-    margin: 18px 0;
-}
-
-
-.task-access-summary div {
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-light);
-}
-
-
-.task-access-summary dt {
-    color: var(--text-secondary);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-.task-access-summary dd {
-    margin: 3px 0 0;
-    font-weight: 600;
-}
-
-
-.task-access-warning {
-    padding: 10px 12px;
-    color: var(--warning-text);
-    background: var(--warning-background);
-    border: 1px solid var(--warning-border);
-}
-
-
-.task-access-footer {
-    padding: 9px;
-    color: #526875;
-    font-size: 11px;
-    text-align: center;
-}
-
-
-@media (max-width: 560px) {
-
-    .task-access-summary {
-        grid-template-columns: 1fr;
-    }
-
-}
+{% endblock %}

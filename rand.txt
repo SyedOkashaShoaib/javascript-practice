@@ -1,82 +1,79 @@
+def get_session_grant_for_task(
+    task: WorkflowTask,
+    *,
+    allow_consumed_read_only: bool = False,
+) -> Optional[TaskAccessGrant]:
+    """
+    Return the grant authorizing the current browser session.
 
-======================================================================
-EMAIL NOTIFICATION — DEVELOPMENT MODE
-======================================================================
-To: internee@company.com
-Subject: Offboarding Action Required — OFF-2026-0037
-----------------------------------------------------------------------
-Offboarding Action Required
+    The signed Flask session must identify both the supplied task
+    and its active access grant. Revoked, expired, or otherwise
+    invalid grants cannot authorize the request.
 
-A new employee offboarding task has been assigned.
+    A consumed grant may display a completed task through a
+    read-only GET request in the same browser session.
+    """
 
-Case Number: OFF-2026-0037
-Employee: employee 43
-Employee ID: 41
-Phase: MIS Business Applications Clearance
-Assigned Department: MIS
-Due At: 27 July 2026, 04:29 AM
+    grant_id = session.get(
+        ACTIVE_GRANT_SESSION_KEY
+    )
 
-Open Assigned Task: http://127.0.0.1:5000/task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA
+    task_id = session.get(
+        ACTIVE_TASK_SESSION_KEY
+    )
 
-Security notice: This secure link is intended only for the assigned department. Do not forward or share it.
-======================================================================
+    if grant_id is None or task_id is None:
+        return None
 
-127.0.0.1 - - [20/Jul/2026 09:29:11] "POST /workflow/tasks/57 HTTP/1.1" 302 -
-127.0.0.1 - - [20/Jul/2026 09:29:11] "GET /workflow/tasks/57 HTTP/1.1" 200 -
-127.0.0.1 - - [20/Jul/2026 09:29:12] "GET /static/js/task_checklist.js HTTP/1.1" 304 -
-127.0.0.1 - - [20/Jul/2026 09:29:12] "GET /static/css/app.css HTTP/1.1" 304 -
-127.0.0.1 - - [20/Jul/2026 09:29:12] "GET /static/css/pages/task_access.css HTTP/1.1" 304 -
-127.0.0.1 - - [20/Jul/2026 09:29:12] "GET /static/css/pages/task.css HTTP/1.1" 304 -
-127.0.0.1 - - [20/Jul/2026 09:29:19] "GET /task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA HTTP/1.1" 500 -
-Traceback (most recent call last):
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 1536, in __call__
-    return self.wsgi_app(environ, start_response)
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 1514, in wsgi_app
-    response = self.handle_exception(e)
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 902, in dispatch_request  
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\routes\task_access_route.py", line 109, in access_link
-    if session_owns_task_access_grant(
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\services\task_access_service.py", line 420, in session_owns_task_access_grant
-    get_session_grant_for_task(
-    response = self.handle_exception(e)
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 902, in dispatch_request  
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\routes\task_access_route.py", line 109, in access_link
-    if session_owns_task_access_grant(
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\services\task_access_service.py", line 420, in session_owns_task_access_grant
-    get_session_grant_for_task(
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\.venv\lib\site-packages\flask\app.py", line 902, in dispatch_request  
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\routes\task_access_route.py", line 109, in access_link
-    if session_owns_task_access_grant(
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\services\task_access_service.py", line 420, in session_owns_task_access_grant
-    get_session_grant_for_task(
-  File "C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow\app\services\task_access_service.py", line 420, in session_owns_task_access_grant
-    get_session_grant_for_task(
-NameError: name 'get_session_grant_for_task' is not defined
-127.0.0.1 - - [20/Jul/2026 09:29:19] "GET /task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
-127.0.0.1 - - [20/Jul/2026 09:29:19] "GET /task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
-127.0.0.1 - - [20/Jul/2026 09:29:19] "GET /task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
-127.0.0.1 - - [20/Jul/2026 09:29:19] "GET /task-access/aH1Iygd72kRDs17IlTmfze3uClVsMTdW6Ux0-4Ga4jA?__debugger__=yes&cmd=resource&f=console.png&s=kqZUN3a4mkAWAo5Jaz8k HTTP/1.1" 200 -
-(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow>  
+    try:
+        normalized_grant_id = int(grant_id)
+        normalized_task_id = int(task_id)
 
+    except (TypeError, ValueError):
+        return None
 
+    if normalized_task_id != task.id:
+        return None
 
+    grant = db.session.get(
+        TaskAccessGrant,
+        normalized_grant_id,
+    )
 
+    if grant is None:
+        return None
 
+    if grant.workflow_task_id != task.id:
+        return None
 
+    if grant.revoked_at is not None:
+        return None
 
+    expires_at = normalize_datetime(
+        grant.expires_at
+    )
 
+    if (
+        expires_at is None
+        or expires_at <= utc_now()
+    ):
+        return None
+
+    # A grant must have completed the confirmation POST before
+    # it can authorize an operational task URL.
+    if int(grant.access_count or 0) < 1:
+        return None
+
+    if grant.consumed_at is not None:
+        if (
+            allow_consumed_read_only
+            and request.method == "GET"
+        ):
+            return grant
+
+        return None
+
+    if task.status not in OPEN_TASK_STATUSES:
+        return None
+
+    return grant

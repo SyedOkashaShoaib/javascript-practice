@@ -1,19 +1,482 @@
-Select-String `
-    -Path app\models.py `
-    -Pattern "^class OffboardingCase" `
-    -Context 0,90
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> Select-String `
+>>     -Path app\models.py `
+>>     -Pattern "^class OffboardingCase" `
+>>     -Context 0,90
 
-Select-String `
-    -Path app\models.py `
-    -Pattern "^class WorkflowTask|^class ChecklistResponse" `
-    -Context 0,90
+> app\models.py:270:class OffboardingCase(db.Model):
+  app\models.py:271:    __tablename__ = "offboarding_cases"
+  app\models.py:272:    __table_args__=(
+  app\models.py:273:        db.Index(
+  app\models.py:274:        "ix_offboarding_case_status_updated_at",
+  app\models.py:275:        "status",
+  app\models.py:276:        "updated_at",
+  app\models.py:277:    ),
+  app\models.py:278:        db.Index(
+  app\models.py:279:            "ix_offboarding_case_current_phase_status",
+  app\models.py:280:            "current_phase_id",
+  app\models.py:281:            "status",
+  app\models.py:282:        ),
+  app\models.py:283:        db.Index(
+  app\models.py:284:            "ix_offboarding_case_employee_id",
+  app\models.py:285:            "employee_id",
+  app\models.py:286:        ),
+  app\models.py:287:
+  app\models.py:288:    )
+  app\models.py:289:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:290:
+  app\models.py:291:    case_number = db.Column(db.String(50), unique=True, nullable=False)
+  app\models.py:292:
+  app\models.py:293:    employee_name = db.Column(db.String(150), nullable=False)
+  app\models.py:294:    employee_id = db.Column(db.String(50), nullable=False)
+  app\models.py:295:
+  app\models.py:296:    designation = db.Column(db.String(150), nullable=False)
+  app\models.py:297:    department = db.Column(db.String(150), nullable=False)
+  app\models.py:298:    last_working_day = db.Column(db.Date, nullable=False)
+  app\models.py:299:
+  app\models.py:300:    line_manager = db.Column(db.String(150), nullable=False)
+  app\models.py:301:
+  app\models.py:302:    status = db.Column(db.String(50), nullable=False, default="CREATED")
+  app\models.py:303:
+  app\models.py:304:    current_phase_id = db.Column(
+  app\models.py:305:        db.Integer,
+  app\models.py:306:        db.ForeignKey("workflow_phases.id"),
+  app\models.py:307:        nullable=True
+  app\models.py:308:    )
+  app\models.py:309:
+  app\models.py:310:    created_by = db.Column(db.String(150), nullable=True)
+  app\models.py:311:
+  app\models.py:312:    created_at = db.Column(
+  app\models.py:313:        db.DateTime(timezone=True),
+  app\models.py:314:        default=utc_now,
+  app\models.py:315:        nullable=False
+  app\models.py:316:    )
+  app\models.py:317:
+  app\models.py:318:    updated_at = db.Column(
+  app\models.py:319:        db.DateTime(timezone=True),
+  app\models.py:320:        default=utc_now,
+  app\models.py:321:        onupdate=utc_now,
+  app\models.py:322:        nullable=False
+  app\models.py:323:    )
+  app\models.py:324:
+  app\models.py:325:    closed_at = db.Column(db.DateTime(timezone=True), nullable=True)
+  app\models.py:326:
+  app\models.py:327:    current_phase = db.relationship(
+  app\models.py:328:        "WorkflowPhase",
+  app\models.py:329:        foreign_keys=[current_phase_id]
+  app\models.py:330:    )
+  app\models.py:331:
+  app\models.py:332:    tasks = db.relationship(
+  app\models.py:333:        "WorkflowTask",
+  app\models.py:334:        back_populates="case",
+  app\models.py:335:        cascade="all, delete-orphan"
+  app\models.py:336:    )
+  app\models.py:337:
+  app\models.py:338:    audit_logs = db.relationship(
+  app\models.py:339:        "AuditLog",
+  app\models.py:340:        back_populates="case",
+  app\models.py:341:        cascade="all, delete-orphan"
+  app\models.py:342:    )
+  app\models.py:343:
+  app\models.py:345:        return f"<OffboardingCase {self.case_number} - {self.employee_name}>"
+  app\models.py:346:
+  app\models.py:347:
+  app\models.py:349:    __tablename__ = "workflow_tasks"
+  app\models.py:350:    __table_args__= (
+  app\models.py:351:        db.UniqueConstraint(
+  app\models.py:352:            "case_id",
+  app\models.py:353:            "phase_id",
+  app\models.py:354:            name="uq_workflow_tasks_case_phase",
+  app\models.py:355:        ),
+  app\models.py:356:        db.Index(
+  app\models.py:357:            "ix_workflow_tasks_status_due_at",
+  app\models.py:358:            "status",
+  app\models.py:359:            "due_at",
+  app\models.py:360:        ),
 
-Select-String `
-    -Path app\models.py `
-    -Pattern "^class AuditLog|^class EmailNotification" `
-    -Context 0,70
 
-Select-String `
-    -Path app\models.py `
-    -Pattern "^class Department|^class WorkflowPhase|^class ChecklistItem" `
-    -Context 0,70
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> 
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> Select-String `
+>>     -Path app\models.py `
+>>     -Pattern "^class WorkflowTask|^class ChecklistResponse" `
+>>     -Context 0,90
+
+> app\models.py:348:class WorkflowTask(db.Model):
+  app\models.py:349:    __tablename__ = "workflow_tasks"
+  app\models.py:350:    __table_args__= (
+  app\models.py:351:        db.UniqueConstraint(
+  app\models.py:352:            "case_id",
+  app\models.py:353:            "phase_id",
+  app\models.py:354:            name="uq_workflow_tasks_case_phase",
+  app\models.py:355:        ),
+  app\models.py:356:        db.Index(
+  app\models.py:357:            "ix_workflow_tasks_status_due_at",
+  app\models.py:358:            "status",
+  app\models.py:359:            "due_at",
+  app\models.py:360:        ),
+  app\models.py:361:
+  app\models.py:362:    )
+  app\models.py:363:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:364:
+  app\models.py:365:    case_id = db.Column(
+  app\models.py:366:        db.Integer,
+  app\models.py:367:        db.ForeignKey("offboarding_cases.id"),
+  app\models.py:368:        nullable=False
+  app\models.py:369:    )
+  app\models.py:370:
+  app\models.py:371:    phase_id = db.Column(
+  app\models.py:372:        db.Integer,
+  app\models.py:373:        db.ForeignKey("workflow_phases.id"),
+  app\models.py:374:        nullable=False
+  app\models.py:375:    )
+  app\models.py:376:
+  app\models.py:377:    assigned_to_email = db.Column(db.String(150), nullable=False)
+  app\models.py:378:    status = db.Column(db.String(50), nullable=False, default="PENDING")
+  app\models.py:379:
+  app\models.py:380:    assigned_at = db.Column(
+  app\models.py:381:        db.DateTime(timezone=True),
+  app\models.py:382:        default=utc_now,
+  app\models.py:383:        nullable=False
+  app\models.py:384:    )
+  app\models.py:385:
+  app\models.py:386:    due_at = db.Column(
+  app\models.py:387:        db.DateTime(timezone=True),
+  app\models.py:388:        default=lambda: utc_now() + timedelta(days=7),
+  app\models.py:389:        nullable=False
+  app\models.py:390:    )
+  app\models.py:391:
+  app\models.py:392:    opened_at = db.Column(db.DateTime(timezone=True), nullable=True)
+  app\models.py:393:    submitted_at = db.Column(db.DateTime(timezone=True), nullable=True)
+  app\models.py:394:
+  app\models.py:395:    case = db.relationship("OffboardingCase", back_populates="tasks")
+  app\models.py:396:    phase = db.relationship("WorkflowPhase", back_populates="tasks")
+  app\models.py:397:
+  app\models.py:398:    responses = db.relationship(
+  app\models.py:399:        "ChecklistResponse",
+  app\models.py:400:        back_populates="workflow_task",
+  app\models.py:401:        cascade="all, delete-orphan"
+  app\models.py:402:    )
+  app\models.py:403:    notifications= db.relationship(
+  app\models.py:404:        "EmailNotification",
+  app\models.py:405:        back_populates='workflow_task',
+  app\models.py:406:        cascade='all, delete-orphan')
+  app\models.py:407:    access_grants = db.relationship(
+  app\models.py:408:    "TaskAccessGrant",
+  app\models.py:409:    back_populates="workflow_task",
+  app\models.py:410:    cascade="all, delete-orphan",
+  app\models.py:411:)
+  app\models.py:412:    def __repr__(self):
+  app\models.py:413:        return f"<WorkflowTask Case={self.case_id} Phase={self.phase_id} Status={self.status}>"        
+  app\models.py:414:class TaskAccessGrant(db.Model):
+  app\models.py:415:    """
+  app\models.py:416:    Secure access grant for one departmental workflow task.
+  app\models.py:417:
+  app\models.py:418:    The raw token is sent through email but is never stored in the
+  app\models.py:419:    database. Only its SHA-256 digest is persisted.
+  app\models.py:420:    """
+  app\models.py:421:
+  app\models.py:422:    __tablename__ = "task_access_grants"
+  app\models.py:423:
+  app\models.py:424:    __table_args__ = (
+  app\models.py:425:        db.Index(
+  app\models.py:426:            "ix_task_access_grants_task_state",
+  app\models.py:427:            "workflow_task_id",
+  app\models.py:428:            "revoked_at",
+  app\models.py:429:            "consumed_at",
+  app\models.py:430:        ),
+  app\models.py:431:    )
+  app\models.py:432:
+  app\models.py:433:    id = db.Column(
+  app\models.py:434:        db.Integer,
+  app\models.py:435:        primary_key=True,
+  app\models.py:436:    )
+  app\models.py:437:
+  app\models.py:438:    workflow_task_id = db.Column(
+> app\models.py:498:class ChecklistResponse(db.Model):
+  app\models.py:499:    __tablename__ = "checklist_responses"
+  app\models.py:500:
+  app\models.py:501:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:502:
+  app\models.py:503:    case_id = db.Column(
+  app\models.py:504:        db.Integer,
+  app\models.py:505:        db.ForeignKey("offboarding_cases.id"),
+  app\models.py:506:        nullable=False
+  app\models.py:507:    )
+  app\models.py:508:
+  app\models.py:509:    workflow_task_id = db.Column(
+  app\models.py:510:        db.Integer,
+  app\models.py:511:        db.ForeignKey("workflow_tasks.id"),
+  app\models.py:512:        nullable=False
+  app\models.py:513:    )
+  app\models.py:514:
+  app\models.py:515:    checklist_item_id = db.Column(
+  app\models.py:516:        db.Integer,
+  app\models.py:517:        db.ForeignKey("checklist_items.id"),
+  app\models.py:518:        nullable=False
+  app\models.py:519:    )
+  app\models.py:520:
+  app\models.py:521:    response_status = db.Column(db.String(50), nullable=False)
+  app\models.py:522:    not_applicable_reason = db.Column(db.Text, nullable=True)
+  app\models.py:523:
+  app\models.py:524:    responded_by = db.Column(db.String(150), nullable=True)
+  app\models.py:525:
+  app\models.py:526:    responded_at = db.Column(
+  app\models.py:527:        db.DateTime(timezone=True),
+  app\models.py:528:        default=utc_now,
+  app\models.py:529:        nullable=False
+  app\models.py:530:    )
+  app\models.py:531:
+  app\models.py:532:    workflow_task = db.relationship("WorkflowTask", back_populates="responses")
+  app\models.py:533:    checklist_item = db.relationship("ChecklistItem", back_populates="responses")
+  app\models.py:534:
+  app\models.py:535:    __table_args__ = (
+  app\models.py:536:        db.UniqueConstraint(
+  app\models.py:537:            "workflow_task_id",
+  app\models.py:538:            "checklist_item_id",
+  app\models.py:539:            name="uq_task_checklist_item_response"
+  app\models.py:540:        ),
+  app\models.py:541:    )
+  app\models.py:542:
+  app\models.py:543:    def __repr__(self):
+  app\models.py:544:        return f"<ChecklistResponse Task={self.workflow_task_id} Item={self.checklist_item_id}>"       
+  app\models.py:545:
+  app\models.py:546:
+  app\models.py:547:class AuditLog(db.Model):
+  app\models.py:548:    __tablename__ = "audit_logs"
+  app\models.py:549:    __table_args__ = (
+  app\models.py:550:        db.Index(
+  app\models.py:551:            "ix_audit_log_case_created_at",
+  app\models.py:552:            "case_id",
+  app\models.py:553:            "created_at",
+  app\models.py:554:        ),
+  app\models.py:555:    )
+  app\models.py:556:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:557:
+  app\models.py:558:    case_id = db.Column(
+  app\models.py:559:        db.Integer,
+  app\models.py:560:        db.ForeignKey("offboarding_cases.id"),
+  app\models.py:561:        nullable=False
+  app\models.py:562:    )
+  app\models.py:563:
+  app\models.py:564:    action = db.Column(db.String(150), nullable=False)
+  app\models.py:565:    performed_by = db.Column(db.String(150), nullable=True)
+  app\models.py:566:    details = db.Column(db.Text, nullable=True)
+  app\models.py:567:
+  app\models.py:568:    created_at = db.Column(
+  app\models.py:569:        db.DateTime(timezone=True),
+  app\models.py:570:        default=utc_now,
+  app\models.py:571:        nullable=False
+  app\models.py:573:
+  app\models.py:574:    case = db.relationship("OffboardingCase", back_populates="audit_logs")
+  app\models.py:575:
+  app\models.py:577:        return f"<AuditLog {self.action}>"
+  app\models.py:578:
+  app\models.py:579:
+  app\models.py:580:class EmailNotification(db.Model):
+  app\models.py:581:    __tablename__ = 'email_notifications'
+  app\models.py:582:    __table_args__=(
+  app\models.py:583:        db.Index("ix_email_notifications_case_status",
+  app\models.py:584:                 "case_id",
+  app\models.py:585:                 "status",),
+  app\models.py:586:        db.Index("ix_email_notifications_task_type",
+  app\models.py:587:                 "workflow_task_id",
+  app\models.py:588:                 "notification_type",),
+
+
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> 
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> Select-String `
+>>     -Path app\models.py `
+>>     -Pattern "^class AuditLog|^class EmailNotification" `
+>>     -Context 0,70
+
+> app\models.py:547:class AuditLog(db.Model):
+  app\models.py:548:    __tablename__ = "audit_logs"
+  app\models.py:549:    __table_args__ = (
+  app\models.py:550:        db.Index(
+  app\models.py:551:            "ix_audit_log_case_created_at",
+  app\models.py:552:            "case_id",
+  app\models.py:553:            "created_at",
+  app\models.py:554:        ),
+  app\models.py:555:    )
+  app\models.py:556:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:557:
+  app\models.py:558:    case_id = db.Column(
+  app\models.py:559:        db.Integer,
+  app\models.py:560:        db.ForeignKey("offboarding_cases.id"),
+  app\models.py:561:        nullable=False
+  app\models.py:562:    )
+  app\models.py:563:
+  app\models.py:564:    action = db.Column(db.String(150), nullable=False)
+  app\models.py:565:    performed_by = db.Column(db.String(150), nullable=True)
+  app\models.py:566:    details = db.Column(db.Text, nullable=True)
+  app\models.py:567:
+  app\models.py:568:    created_at = db.Column(
+  app\models.py:569:        db.DateTime(timezone=True),
+  app\models.py:570:        default=utc_now,
+  app\models.py:571:        nullable=False
+  app\models.py:572:    )
+  app\models.py:573:
+  app\models.py:574:    case = db.relationship("OffboardingCase", back_populates="audit_logs")
+  app\models.py:575:
+  app\models.py:576:    def __repr__(self):
+  app\models.py:577:        return f"<AuditLog {self.action}>"
+  app\models.py:578:
+  app\models.py:579:
+> app\models.py:580:class EmailNotification(db.Model):
+  app\models.py:581:    __tablename__ = 'email_notifications'
+  app\models.py:582:    __table_args__=(
+  app\models.py:583:        db.Index("ix_email_notifications_case_status",
+  app\models.py:584:                 "case_id",
+  app\models.py:585:                 "status",),
+  app\models.py:586:        db.Index("ix_email_notifications_task_type",
+  app\models.py:587:                 "workflow_task_id",
+  app\models.py:588:                 "notification_type",),
+  app\models.py:589:    )
+  app\models.py:590:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:591:    case_id = db.Column(db.Integer, db.ForeignKey('offboarding_cases.id'), nullable=False)
+  app\models.py:592:    workflow_task_id = db.Column(db.Integer, db.ForeignKey('workflow_tasks.id'), nullable=False)       
+  app\models.py:593:    notification_type = db.Column(db.String(50), nullable=False, default='TASK_ASSIGNED')
+  app\models.py:594:    deduplication_key = db.Column(db.String(255), unique= True, nullable=True)
+  app\models.py:596:    subject = db.Column(db.String(255), nullable=False)
+  app\models.py:597:    status = db.Column(db.String(30), nullable=False, default='PENDING')
+  app\models.py:598:    provider_message_id = db.Column(db.String(255), nullable=True)
+  app\models.py:600:    created_at = db.Column(db.DateTime(timezone=True), default = utc_now, nullable=False)
+  app\models.py:601:    attempted_at = db.Column(db.DateTime(timezone=True), nullable=True)
+  app\models.py:602:    sent_at = db.Column(db.DateTime(timezone=True), nullable=True)
+  app\models.py:603:    case = db.relationship("OffboardingCase")
+  app\models.py:604:    workflow_task = db.relationship("WorkflowTask", back_populates='notifications')
+  app\models.py:605:
+  app\models.py:606:    def __repr__(self):
+  app\models.py:607:        return (
+  app\models.py:608:            f"EmailNotification"
+  app\models.py:609:            f"Task={self.workflow_task_id}"
+  app\models.py:610:            f"Status={self.status}"
+  app\models.py:611:        )
+
+
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> 
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> Select-String `
+>>     -Path app\models.py `
+>>     -Pattern "^class Department|^class WorkflowPhase|^class ChecklistItem" `
+>>     -Context 0,70
+
+> app\models.py:198:class Department(db.Model):
+  app\models.py:199:    __tablename__ = "departments"
+  app\models.py:200:
+  app\models.py:201:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:202:    name = db.Column(db.String(100), unique=True, nullable=False)
+  app\models.py:203:    email = db.Column(db.String(150), nullable=False)
+  app\models.py:204:    is_active = db.Column(db.Boolean, default=True, nullable=False)
+  app\models.py:205:
+  app\models.py:206:    phases = db.relationship("WorkflowPhase", back_populates="department")
+  app\models.py:207:
+  app\models.py:208:    def __repr__(self):
+  app\models.py:209:        return f"<Department {self.name}>"
+  app\models.py:210:
+  app\models.py:211:
+> app\models.py:212:class WorkflowPhase(db.Model):
+  app\models.py:213:    __tablename__ = "workflow_phases"
+  app\models.py:214:
+  app\models.py:215:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:216:    name = db.Column(db.String(150), nullable=False)
+  app\models.py:217:    slug = db.Column(db.String(100), unique=True, nullable=False)
+  app\models.py:218:
+  app\models.py:219:    department_id = db.Column(
+  app\models.py:220:        db.Integer,
+  app\models.py:221:        db.ForeignKey("departments.id"),
+  app\models.py:222:        nullable=False
+  app\models.py:223:    )
+  app\models.py:224:
+  app\models.py:225:    phase_order = db.Column(db.Integer, nullable=False)
+  app\models.py:226:    description = db.Column(db.Text, nullable=True)
+  app\models.py:227:    is_final_approval = db.Column(db.Boolean, default=False, nullable=False)
+  app\models.py:228:    is_active = db.Column(db.Boolean, default=True, nullable=False)
+  app\models.py:229:
+  app\models.py:230:    department = db.relationship("Department", back_populates="phases")
+  app\models.py:231:
+  app\models.py:232:    checklist_items = db.relationship(
+  app\models.py:233:        "ChecklistItem",
+  app\models.py:234:        back_populates="phase",
+  app\models.py:235:        order_by="ChecklistItem.display_order",
+  app\models.py:236:        cascade="all, delete-orphan"
+  app\models.py:237:    )
+  app\models.py:238:
+  app\models.py:239:    tasks = db.relationship("WorkflowTask", back_populates="phase")
+  app\models.py:240:
+  app\models.py:241:    def __repr__(self):
+  app\models.py:242:        return f"<WorkflowPhase {self.phase_order} - {self.name}>"
+  app\models.py:243:
+  app\models.py:244:
+> app\models.py:245:class ChecklistItem(db.Model):
+  app\models.py:246:    __tablename__ = "checklist_items"
+  app\models.py:247:
+  app\models.py:248:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:249:
+  app\models.py:250:    phase_id = db.Column(
+  app\models.py:251:        db.Integer,
+  app\models.py:252:        db.ForeignKey("workflow_phases.id"),
+  app\models.py:253:        nullable=False
+  app\models.py:254:    )
+  app\models.py:255:
+  app\models.py:256:    section = db.Column(db.String(150), nullable=True)
+  app\models.py:257:    item_text = db.Column(db.Text, nullable=False)
+  app\models.py:258:    display_order = db.Column(db.Integer, nullable=False)
+  app\models.py:259:
+  app\models.py:260:    is_required = db.Column(db.Boolean, default=True, nullable=False)
+  app\models.py:261:    is_active = db.Column(db.Boolean, default=True, nullable=False)
+  app\models.py:262:
+  app\models.py:263:    phase = db.relationship("WorkflowPhase", back_populates="checklist_items")
+  app\models.py:264:    responses = db.relationship("ChecklistResponse", back_populates="checklist_item")
+  app\models.py:265:
+  app\models.py:266:    def __repr__(self):
+  app\models.py:267:        return f"<ChecklistItem {self.item_text[:40]}>"
+  app\models.py:268:
+  app\models.py:269:
+  app\models.py:270:class OffboardingCase(db.Model):
+  app\models.py:271:    __tablename__ = "offboarding_cases"
+  app\models.py:272:    __table_args__=(
+  app\models.py:273:        db.Index(
+  app\models.py:274:        "ix_offboarding_case_status_updated_at",
+  app\models.py:275:        "status",
+  app\models.py:276:        "updated_at",
+  app\models.py:277:    ),
+  app\models.py:278:        db.Index(
+  app\models.py:279:            "ix_offboarding_case_current_phase_status",
+  app\models.py:280:            "current_phase_id",
+  app\models.py:281:            "status",
+  app\models.py:282:        ),
+  app\models.py:283:        db.Index(
+  app\models.py:284:            "ix_offboarding_case_employee_id",
+  app\models.py:285:            "employee_id",
+  app\models.py:286:        ),
+  app\models.py:287:
+  app\models.py:288:    )
+  app\models.py:289:    id = db.Column(db.Integer, primary_key=True)
+  app\models.py:290:
+  app\models.py:291:    case_number = db.Column(db.String(50), unique=True, nullable=False)
+  app\models.py:292:
+  app\models.py:293:    employee_name = db.Column(db.String(150), nullable=False)
+  app\models.py:294:    employee_id = db.Column(db.String(50), nullable=False)
+  app\models.py:295:
+  app\models.py:296:    designation = db.Column(db.String(150), nullable=False)
+  app\models.py:297:    department = db.Column(db.String(150), nullable=False)
+  app\models.py:298:    last_working_day = db.Column(db.Date, nullable=False)
+  app\models.py:299:
+  app\models.py:300:    line_manager = db.Column(db.String(150), nullable=False)
+  app\models.py:301:
+  app\models.py:302:    status = db.Column(db.String(50), nullable=False, default="CREATED")
+  app\models.py:303:
+  app\models.py:304:    current_phase_id = db.Column(
+  app\models.py:305:        db.Integer,
+  app\models.py:306:        db.ForeignKey("workflow_phases.id"),
+  app\models.py:307:        nullable=True
+  app\models.py:308:    )
+  app\models.py:309:
+  app\models.py:310:    created_by = db.Column(db.String(150), nullable=True)
+  app\models.py:311:
+  app\models.py:312:    created_at = db.Column(
+  app\models.py:313:        db.DateTime(timezone=True),
+  app\models.py:314:        default=utc_now,
+  app\models.py:315:        nullable=False
+
+
+(.venv) PS C:\Users\intern\Desktop\intern_summer_26\offboarding_workflow> 
